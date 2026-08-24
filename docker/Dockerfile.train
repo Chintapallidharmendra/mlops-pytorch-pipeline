@@ -1,0 +1,32 @@
+# ---- Stage 1: base -------------------------------------------------------
+FROM python:3.11-slim-bookworm AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# libgomp1 provides libgomp.so.1, which the official PyTorch Linux pip
+# wheel dynamically links against at import time. python:*-slim does not
+# ship it, and its absence is a commonly hit runtime failure
+# ("OSError: libgomp.so.1: cannot open shared object file").
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements/train.txt .
+RUN pip install --no-cache-dir -r train.txt
+
+# ---- Stage 2: training runtime -------------------------------------------
+FROM base AS training
+
+COPY src/ ./src/
+COPY configs/ ./configs/
+
+ENV PYTHONUNBUFFERED=1
+
+# train.py does bare `from dataset import ...` / `from model import ...`,
+# which only resolve because Python adds the launched script's own
+# directory (/app/src) to sys.path. Must run exactly this way from
+# WORKDIR /app.
+ENTRYPOINT ["python", "src/train.py"]
