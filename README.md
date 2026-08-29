@@ -1,10 +1,12 @@
 # mlops-pytorch-pipeline
+
 ---
 
 #### This is an academic project from MLOps course in Web Enabled M-Tech course. It is implemented and maintained by Chintapalli Dharmendra (DA25M559).
----
-### Project Structure
 
+---
+
+### Project Structure
 
 ```Shell
 mlops-pytorch-pipeline/
