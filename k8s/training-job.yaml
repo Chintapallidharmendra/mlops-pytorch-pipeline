@@ -19,6 +19,11 @@ spec:
         - name: train
           image: mlops-train:v1
           imagePullPolicy: IfNotPresent
+          env:
+            - name: OMP_NUM_THREADS
+              value: "2"
+            - name: MKL_NUM_THREADS
+              value: "2"
           resources:
             requests:
               cpu: "2"
