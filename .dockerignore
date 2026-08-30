@@ -1,0 +1,15 @@
+# Version control
+.git/
+
+# Python virtual env / bytecode
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Large local artifacts — mounted into the container at runtime, not baked in
+data/
+checkpoints/
+
+# OS cruft
+.DS_Store

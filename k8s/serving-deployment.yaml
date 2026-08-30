@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serving
+  namespace: ml-training
+  labels:
+    app: serving
+    project: mlops-pytorch-pipeline
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: serving
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: serving
+        project: mlops-pytorch-pipeline
+    spec:
+      containers:
+        - name: serve
+          image: mlops-serve:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          volumeMounts:
+            - name: checkpoints
+              mountPath: /app/checkpoints
+              readOnly: true
+      volumes:
+        - name: checkpoints
+          persistentVolumeClaim:
+            claimName: training-checkpoints-pvc
+            readOnly: true
