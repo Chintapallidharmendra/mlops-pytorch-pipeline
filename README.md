@@ -77,8 +77,13 @@ mlops-pytorch-pipeline/
 ··· requirements/
 · ··· train.txt
 · ··· serve.txt
+· ··· test.txt
 ··· tests/
-··· test_model.py
+· ··· conftest.py
+· ··· test_model.py
+· ··· test_dataset.py
+· ··· test_train.py
+· ··· test_serve.py
 ```
 
 ### Setup
@@ -122,11 +127,11 @@ curl -X POST http://localhost:8080/predict -F "file=@test_image.png"
 **4. Tests**
 
 ```bash
-pip install pytest
+pip install -r requirements/test.txt
 pytest tests/
 ```
 
-`tests/test_model.py` is currently an empty scaffold reserved for model/unit tests.
+Covers model construction/forward-pass shapes (`test_model.py`), dataset transforms (`test_dataset.py`), the training/eval loops on synthetic data (`test_train.py`), and the `/health` and `/predict` FastAPI endpoints via a temporary checkpoint (`test_serve.py`). All tests run on CPU with `pretrained=False` and synthetic data, so no network access or CIFAR-10 download is required.
 
 ### Training Image
 
